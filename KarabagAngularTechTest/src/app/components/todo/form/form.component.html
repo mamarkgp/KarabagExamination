@@ -1,0 +1,30 @@
+<form class="form" [formGroup]="todoFormGroup" (submit)="OnSubmit()">
+    <mat-form-field appearance="fill">
+        <mat-label>ID</mat-label>
+        <input matInput formControlName="id">
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Label</mat-label>
+        <input matInput formControlName="label">
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Description</mat-label>
+        <input matInput formControlName="description">
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>Category</mat-label>
+        <mat-select formControlName="category">
+            <ng-container *ngFor="let category of categories">
+                <mat-option [value]="category">{{ category | titlecase }}</mat-option>
+            </ng-container>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field appearance="fill">
+        <mat-label>End Date</mat-label>
+        <input matInput [matDatepicker]="picker" [min]="today" formControlName="endDate">
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <button mat-raised-button color="basic" class="submit" [disabled]="todoFormGroup.invalid || !todoFormGroup.dirty">{{ mode === modes.Add ? 'Add' : 'Save' }}</button>
+</form>

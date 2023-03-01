@@ -1,0 +1,52 @@
+<div class="list">
+    <table mat-table [dataSource]="todoList" class="table mat-elevation-z8">
+        <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef> ID </th>
+            <td mat-cell *matCellDef="let todo"> {{ todo.id }} </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="label">
+            <th mat-header-cell *matHeaderCellDef> Label </th>
+            <td mat-cell *matCellDef="let todo"> {{ todo.label }} </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef> Description </th>
+            <td mat-cell *matCellDef="let todo"> {{ todo.description }} </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="category">
+            <th mat-header-cell *matHeaderCellDef> Category </th>
+            <td mat-cell *matCellDef="let todo"> {{ todo.category | titlecase }} </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="endDate">
+            <th mat-header-cell *matHeaderCellDef> End Date </th>
+            <td mat-cell *matCellDef="let todo"> {{ todo.endDate || '--' | date: 'YYYY-MM-dd'}} </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <td mat-cell *matCellDef="let todo" class="action-buttons">
+                <button mat-raised-button color="accent" (click)="showDetails(todo)">Show details</button>
+                <button mat-raised-button color="primary" (click)="deleteTodo(todo)">Delete</button>
+            </td>
+        </ng-container>
+    
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns;"></tr>
+    </table>
+    
+    <button mat-raised-button color="basic" *ngIf="mode !== modes.Add" (click)="mode = modes.Add">Add new todo</button>
+    
+    <div class="operations" *ngIf="!(loading$ | async)">
+        <ng-container [ngSwitch]="mode">
+            <ng-container *ngSwitchCase="modes.Details">
+                <app-details [todo]="selectedTodo" (updatedTodoList)="OnUpdatedTodoList()"></app-details>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+                <app-add [id]="nextId" (updatedTodoList)="OnUpdatedTodoList()"></app-add>
+            </ng-container>
+        </ng-container>
+    </div>
+</div>

@@ -1,0 +1,19 @@
+.list {
+    table {
+        margin-bottom: 20px;
+
+        .action-buttons {
+            button~button {
+                margin-left: 10px !important;
+            }
+        }
+    }
+
+    .operations {
+        border: 1px solid #d0d0d0;
+        padding: 20px;
+        margin: 20px;
+    }
+
+    margin: 20px;
+}

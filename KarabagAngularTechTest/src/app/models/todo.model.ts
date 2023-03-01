@@ -4,4 +4,5 @@ export interface Todo {
     description: string;
     category: string;
     endDate?: string;
+    markedAsDone: boolean;
 }

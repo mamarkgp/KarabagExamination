@@ -3,6 +3,7 @@ import { Subject, BehaviorSubject, takeUntil } from 'rxjs';
 import { ModeEnum } from 'src/app/enums/mode.enum';
 import { Todo } from 'src/app/models/todo.model';
 import { TodoService } from 'src/app/services/todo.service';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-list',
@@ -11,7 +12,17 @@ import { TodoService } from 'src/app/services/todo.service';
 })
 export class ListComponent implements OnInit, OnDestroy {
   columns: string[] = ['id', 'label', 'description', 'category', 'endDate', 'actions'];
-  todoList!: Todo[];
+  _keyword = '';
+  get keyword(): string {
+    return this._keyword;
+  }
+
+  set keyword(value) {
+    this._keyword = value;
+    this.loadList$.next(true);
+  }
+
+  todoList = new MatTableDataSource<Todo>();
   destroy$ = new Subject();
   loading$ = new BehaviorSubject<boolean>(true);
   loadList$ = new Subject();
@@ -31,11 +42,14 @@ export class ListComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe(
           (todoList: Todo[]) => {
-            this.todoList = todoList;
+            todoList = todoList
+              .filter((todoListItem: Todo) => todoListItem.label.toLowerCase().indexOf(this.keyword.toLowerCase()) > -1);
+            this.todoList = new MatTableDataSource(todoList);
 
             if (!this.todoList) return;
 
-            const ids: number[] = this.todoList.map((todo: Todo) => todo.id);
+            // check for next possible id
+            const ids: number[] = this.todoList.data.map((todo: Todo) => todo.id);
             this.nextId = Math.max(...ids) + 1;
 
             let notExistingOnDB = false;
@@ -68,6 +82,21 @@ export class ListComponent implements OnInit, OnDestroy {
   showDetails(todo: Todo) {
     this.mode = ModeEnum.Details;
     this.selectedTodo = todo;
+  }
+
+  toggleMark(todo: Todo) {
+    todo.markedAsDone = !todo.markedAsDone;
+
+    this._todoService.editTodo(todo)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(
+        () => {
+          this.loadList$.next(true);
+        },
+        error => {
+          console.error(error);
+        }
+      )
   }
 
   deleteTodo(todo: Todo): void {
